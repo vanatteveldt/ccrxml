@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block content %}
+      <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+          <h1 class="fw-light">CCR XML</h1>
+          <p class="lead text-muted">Please enter your CCR API key below to get started</p>
+        </div>
+      </div>
+      <form action="/login" method="post">
+        <div class="mb-3">
+          <label for="apikey" class="form-label">CCR API Key</label>
+          <input class="form-control {% if error %}is-invalid{% endif %}" name="key" id="apikey" aria-describedby="apikey" required />
+          <div id="emailHelp" class="form-text">
+            Note: You can find this in your <a href="https://computationalcommunication.org/ccr/user/profile">CCR account</a>
+          </div>
+          <div class="invalid-feedback">
+            Error: {{error}}
+          </div>
+        </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </section>
+{% endblock %}

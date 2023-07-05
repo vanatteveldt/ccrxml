@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row py-lg-5">
+  <div class="col-lg-10 col-md-12 mx-auto">
+    <h1 class="fw-light">CCR XML</h1>
+    <p class="lead text-muted">Logged in to CCR. <a href="/logout">Log out</a></p>
+    <h4>Please check the metadata and XML below:</h4>
+    <hr />
+    <div style='text-align: left'>
+    COMPUTATIONAL COMMUNICATION RESEARCH {{volume}}.{{issue}} ({{year}}) {{fpage}}- <br/>
+https://doi.org/{{doi}}
+    <p><h4>{{title}}</h4></p>
+    {% for author in authors %}
+      <p>{{author.name}}<br/><i>{{author.affiliation}}</i></p>
+    {% endfor %}
+
+    <div style="margin-left: 2em">
+    <p><b>Abstract:</b></p>
+    {% for p in abstract_paras %}
+    <p>{{p}}</p>
+    {% endfor %}
+    <p >
+      <b>Keywords:</b> {% for kw in keywords %}{{kw}}{% if not loop.last %}<span style='color: red'> &centerdot; </span>{% endif %}{% endfor
+        %}</b
+      >
+    </p></div>
+
+  </div>
+<hr/>
+    <h4>Resulting XML:</h4>
+    <pre style="text-align: left; border: 1px solid darkgrey; padding: 1em">
+  {{ xml }}
+</pre>
+<hr />
+<form action="/upload" method="post" enctype="multipart/form-data">
+  <input type='hidden' name='xml' value='{{xml|safe}}' />
+  <input type='hidden' name='doi' value='{{doi}}' />
+        <input id="file" name='file' type="file" />
+    <button class="submit-btn" type="submit">Upload</button>
+</form>
+
+</form>
+  </div>
+</div>
+{% endblock%}

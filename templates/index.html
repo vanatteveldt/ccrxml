@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row py-lg-5">
+  <div class="col-lg-6 col-md-8 mx-auto">
+    <h1 class="fw-light">CCR XML</h1>
+    <p class="lead text-muted">Logged in to CCR. <a href="/logout">Log out</a></p>
+    <p>Enter a submission ID to get started</p>
+    <form action="/submission">
+        <div class="row mb-3">
+            <div class="col sm-10">
+          <input class="form-control {% if error %}is-invalid{% endif %}" name="id" id="id" placeholder="Submission id" required />
+            </div>
+            <div class="col sm-2">
+                <button type="submit" class="btn btn-primary">Submit</button>
+
+            </div>
+          <div class="invalid-feedback">
+            Error: {{error}}
+          </div>
+        </div>
+        </div>
+      </form>
+
+  </div>
+</div>
+{% endblock%}
