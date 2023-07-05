@@ -16,7 +16,7 @@ async def submission_metadata(base_url, token, id):
 if __name__=='__main__':
     import asyncio
     import json
-    KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.ImI3NmMyY2JjN2JjYjBmNjM2NmM2NzA0MzQwZTc2MTIxYWUwMDA0NDYi.FngRFthuJb0CgRrzurHPSPM6nT-vLOPBjQW94xprQHA"
+    KEY = "..."
     BASE = "https://computationalcommunication.org/ccr"
     async def main(BASE, KEY):
         d = await submission_metadata(BASE, KEY, 188)
