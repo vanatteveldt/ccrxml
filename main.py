@@ -108,15 +108,20 @@ async def submission(request: Request, id: int, latex=None):
     return templates.TemplateResponse("submission.html", context)
 
 
-@app.post("/upload-link")
+@app.post("/upload-link", status_code=302)
 async def uploadlink(request: Request, id: Annotated[int, Form()], url: Annotated[str, Form()]):
     context = await get_context(request, id)
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
             r.raise_for_status()
-            print(dir(r))
             pdf_bytes = await r.read()
-    return create_zip_response(context['doi'], context['jats_xml'], pdf_bytes)
+
+    fn = context['doi'].split("/")[1]
+    zip_bytes = create_zip(fn, context['jats_xml'], pdf_bytes)
+    url = await post_tmpfile(f"{fn}.zip", zip_bytes)
+    return RedirectResponse(url, status_code=302)
+
+    #return create_zip_response(context['doi'], context['jats_xml'], pdf_bytes)
 
 @app.post("/upload-nopdf")
 async def uploadlinknopdf(request: Request, id: Annotated[int, Form()]):
@@ -131,13 +136,30 @@ async def upload(request: Request, id: Annotated[int, Form()], file: UploadFile)
     return create_zip_response(context['doi'], context['jats_xml'], pdf_bytes)
 
 def create_zip_response(doi, xml, pdf_bytes):
-    zip_buffer = io.BytesIO()
     fn = doi.split("/")[1]
+    zip_bytes = create_zip(fn, xml, pdf_bytes)
+
+    return Response(zip_bytes,
+                    media_type='application/x-zip-compressed',
+                    headers={'Content-Disposition': f'attachment; filename="{fn}.zip"'})
+
+async def post_tmpfile(fn, bytes):
+    bytesio = io.BytesIO(bytes)
+    data = aiohttp.FormData()
+    data.add_field('file',
+               bytesio,
+               filename=fn)
+    async with aiohttp.ClientSession() as session:
+        async with session.post('https://tmpfiles.org/api/v1/upload', data=data) as response:
+            print(response)
+            response.raise_for_status()
+            return (await response.json())['data']['url']
+
+
+def create_zip(fn, xml, pdf_bytes):
+    zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zip_file:
         if pdf_bytes:
             zip_file.writestr(f'{fn}.pdf', pdf_bytes)
         zip_file.writestr(f'{fn}.xml', xml)
-
-    return Response(zip_buffer.getvalue(),
-                    media_type='application/x-zip-compressed',
-                    headers={'Content-Disposition': f'attachment; filename="{fn}.zip"'})
+    return zip_buffer.getvalue()
