@@ -3,105 +3,256 @@
   <div class="col-lg-10 col-md-12 mx-auto">
     <h1 class="fw-light">CCR XML</h1>
     <p class="lead text-muted">Logged in to CCR. <a href="/logout">Log out</a></p>
-    <form action="/submission">
-      <div class="row mb-3">
-        <input type="hidden" name="id" value="{{id}}" />
-        <label for="latex" class="col-sm-2 col-form-label">Latex snippet</label>
-        <div class="col-sm-10">
-          <textarea name="latex" class="form-control" id="latex" rows="4" required>
-{% if latex %}{{latex}}{% endif %}</textarea
-          >
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="check-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#check-tab-pane"
+          type="button"
+          role="tab"
+          aria-controls="check-tab-pane"
+          aria-selected="true"
+        >
+          Checklist
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="metadata-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#metadata-tab-pane"
+          type="button"
+          role="tab"
+          aria-controls="metadata-tab-pane"
+          aria-selected="true"
+        >
+          Metadata
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="upload-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#upload-tab-pane"
+          type="button"
+          role="tab"
+          aria-controls="upload-tab-pane"
+          aria-selected="true"
+        >
+          File upload
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent" style="padding-top: 1em">
+      <div
+        class="tab-pane fade show active"
+        id="check-tab-pane"
+        role="tabpanel"
+        aria-labelledby="check-tab"
+        tabindex="0"
+      >
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-{{ 'success' if issue_title else 'danger' }}">
+            {% if issue_title %}Scheduled for publication in: {{issue_title}}{% else %} Not scheduled for
+            publication{%endif%}
+          </li>
+          <li class="list-group-item list-group-item-{{ 'success' if doi_assigned else 'danger' }}">
+            {% if doi_assigned %}DOI Assigned: {{doi}}{% else %} No DOI assigned; suggested doi: {{doi}}{%endif%}
+          </li>
+          <li class="list-group-item list-group-item-{{ 'success' if fpage else 'danger' }}">
+            {% if issue_title %}Guessed first page: {{fpage}} based on {{fpage_source}}{% else %} Could not guess page:
+            {{fpage_source}}{%endif%}
+          </li>
+        </ul>
+        <br />
+        <h5 style="text-align: left">Latex snippet for authors</h5>
+        {% if issue_title and num_unpublished > 1 %}
+        <div class="alert alert-danger" role="alert">
+          Warning: There are multiple unpublished articles in the queue. The first page below and DOI do not take this
+          into account!
         </div>
-      </div>
-      <button type="submit" class="btn btn-primary">Update with latex snippet</button>
-    </form>
-    <p>Metadata for ID {{id}}</p>
-    <hr />
-    <form action="/check" method="post">
-      <div class="row mb-3">
-        <label for="title" class="col-sm-2 col-form-label">Title</label>
-        <div class="col-sm-10">
-          <input name="title" class="form-control" id="title" value="{{title}}" required />
+        {% endif %}
+        <pre style="text-align: left; border: 1px solid darkgrey; background: lightgrey; margin: 0.5em; padding: 0.5em">
+\volume{% raw %}{{% endraw %}{{volume if volume}}{% raw %}}{% endraw %}
+\pubnumber{% raw %}{{% endraw %}{{issue if issue}}{% raw %}}{% endraw %}
+\pubyear{% raw %}{{% endraw %}{{year if year}}{% raw %}}{% endraw %}
+\firstpage{% raw %}{{% endraw %}{{fpage if fpage}}{% raw %}}{% endraw %}
+\doi{% raw %}{{% endraw %}{{doi if doi}}{% raw %}}{% endraw %}</pre
+        >
+        <div class="alert alert-info" role="alert">
+          If this is the first article to be published, send the snippet above to the authors and ask them to create the
+          final camera-ready PDF
         </div>
       </div>
 
-      <div class="row mb-3">
-        <label for="keywords" class="col-sm-2 col-form-label">Keywords</label>
-        <div class="col-sm-10">
-          <input name="keywords" class="form-control" id="keywords" value="{{keywords}}" required />
-        </div>
-      </div>
+      <div
+        class="tab-pane fade show"
+        id="metadata-tab-pane"
+        role="tabpanel"
+        aria-labelledby="metadata-tab"
+        tabindex="1"
+      >
+        <div style="text-align: left">
+          COMPUTATIONAL COMMUNICATION RESEARCH {{volume}}.{{issue}} ({{year}}) {{fpage}}- <br />
+          https://doi.org/{{doi}}
+          <h4>{{title}}</h4>
+          {% for author in authors %}
+          <p>{{author.name}}<br /><i>{{author.affiliation}}</i></p>
+          {% endfor %}
 
-      <div class="row mb-3">
-        <label for="doi" class="col-sm-2 col-form-label">DOI</label>
-        <div class="col-sm-10">
-          <input name="doi" class="form-control" id="doi" value="{{doi}}" required />
+          <div style="margin-left: 2em">
+            <p><b>Abstract:</b></p>
+            {% for p in abstract_paras %}
+            <p>{{p}}</p>
+            {% endfor %}
+            <p>
+              <b>Keywords:</b> {% for kw in keywords %}{{kw}}{% if not loop.last %}<span style="color: red">
+                &centerdot;
+              </span>
+              {% endif %}{% endfor %}
+            </p>
+          </div>
         </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="year" class="col-sm-2 col-form-label">Year</label>
-        <div class="col-sm-10">
-          <input name="year" class="form-control" id="year" value="{{year}}" required />
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="volume" class="col-sm-2 col-form-label">Volume</label>
-        <div class="col-sm-10">
-          <input name="volume" class="form-control" id="volume" value="{{volume}}" required />
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="issue" class="col-sm-2 col-form-label">Issue</label>
-        <div class="col-sm-10">
-          <input name="issue" class="form-control" id="issue" value="{{issue}}" required />
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="fpage" class="col-sm-2 col-form-label">First page</label>
-        <div class="col-sm-10">
-          <input name="fpage" class="form-control" id="fpage" value="{{fpage}}" required />
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="fpage" class="col-sm-2 col-form-label">Author(s)</label>
-        <div class="col-sm-10">
-          {% for i in range(10) %}
+        <hr />
+        <form>
           <div class="row mb-3">
-            <div class="col-sm-6">
-              <input
-                name="author-{{i}}-name"
-                class="form-control"
-                value="{% if authors|length > i%}{{authors[i].name}}{%endif%}"
-                placeholder="Author {{i}} name"
-              />
-            </div>
-            <div class="col-sm-6">
-              <input
-                name="author-{{i}}-affiliation"
-                class="form-control"
-                value="{% if authors|length > i%}{{authors[i].affiliation}}{%endif%}"
-                placeholder="Affiliation"
-              />
+            <label for="title" class="col-sm-2 col-form-label">Title</label>
+            <div class="col-sm-10">
+              <input disabled name="title" class="form-control" id="title" value="{{title}}" required />
             </div>
           </div>
 
-          {% endfor %}
-        </div>
-      </div>
+          <div class="row mb-3">
+            <label for="keywords" class="col-sm-2 col-form-label">Keywords</label>
+            <div class="col-sm-10">
+              <input disabled name="keywords" class="form-control" id="keywords" value="{{keywords}}" required />
+            </div>
+          </div>
 
-      <div class="row mb-3">
-        <label for="abstract" class="col-sm-2 col-form-label">Abstract</label>
-        <div class="col-sm-10">
-          <textarea name="abstract" class="form-control" id="abstract" rows="20" required>{{abstract}}</textarea>
-        </div>
+          <div class="row mb-3">
+            <label for="doi" class="col-sm-2 col-form-label">DOI</label>
+            <div class="col-sm-10">
+              <input disabled name="doi" class="form-control" id="doi" value="{{doi if doi}}" required />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="year" class="col-sm-2 col-form-label">Year</label>
+            <div class="col-sm-10">
+              <input disabled name="year" class="form-control" id="year" value="{{year}}" required />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="volume" class="col-sm-2 col-form-label">Volume</label>
+            <div class="col-sm-10">
+              <input disabled name="volume" class="form-control" id="volume" value="{{volume}}" required />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="issue" class="col-sm-2 col-form-label">Issue</label>
+            <div class="col-sm-10">
+              <input disabled name="issue" class="form-control" id="issue" value="{{issue}}" required />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="fpage" class="col-sm-2 col-form-label">First page</label>
+            <div class="col-sm-10">
+              <input disabled name="fpage" class="form-control" id="fpage" value="{{fpage}}" required />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="fpage" class="col-sm-2 col-form-label">Author(s)</label>
+            <div class="col-sm-10">
+              {% for author in authors %}
+              <div class="row mb-3">
+                <div class="col-sm-6">
+                  <input disabled class="form-control" value="{{author.name}}" />
+                </div>
+                <div class="col-sm-6">
+                  <input disabled class="form-control" value="{{author.affiliation}}" />
+                </div>
+              </div>
+
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="abstract" class="col-sm-2 col-form-label">Abstract</label>
+            <div class="col-sm-10">
+              <textarea disabled name="abstract" class="form-control" id="abstract" rows="20" required>
+{{abstract}}</textarea
+              >
+            </div>
+          </div>
+        </form>
       </div>
-      <button type="submit" class="btn btn-primary">Next step</button>
-    </form>
+      <div
+        class="tab-pane fade show"
+        id="upload-tab-pane"
+        role="tabpanel"
+        aria-labelledby="upload-tab"
+        tabindex="1"
+        style="text-align: left"
+      >
+        <h5>Upload file to generate ZIP file:</h5>
+
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <div class="row mb-3">
+            <input type="hidden" name="id" value="{{id}}" />
+            <input class="col-sm-10" id="file" name="file" type="file" />
+            <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
+          </div>
+        </form>
+        <hr />
+        <h5>Enter link to PDF to generate ZIP file:</h5>
+        <p>
+          In case the file is too large (4.5Mb), upload it to e.g. <a href="https://tmpfiles.org/">tmpfiles</a> and
+          paste the link here.
+        </p>
+
+        <form action="/upload-link" method="post">
+          <input type="hidden" name="id" value="{{id}}" />
+
+          <div class="row mb-3">
+            <label for="url" class="col-sm-2 col-form-label">Link to PDF</label>
+            <div class="col-sm-8">
+              <input
+                name="url"
+                class="form-control"
+                id="url"
+                placeholder="e.g. https://tmpfiles.org/123456/article.zip"
+              />
+            </div>
+            <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
+          </div>
+        </form>
+        <hr />
+        <h5>Generate ZIP file with XML metadata only:</h5>
+        <form action="/upload-nopdf" method="post">
+          <input type="hidden" name="id" value="{{id}}" />
+            <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
+          </div>
+        </form>
+        <hr />
+        <h4>Resulting XML:</h4>
+
+        <pre style="text-align: left; border: 1px solid darkgrey; padding: 1em">
+    {{ jats_xml }}
+  </pre
+        >
+      </div>
+    </div>
+    {% endblock%}
   </div>
 </div>
-{% endblock%}

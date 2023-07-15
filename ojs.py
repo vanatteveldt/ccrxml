@@ -1,4 +1,3 @@
-
 import aiohttp
 
 async def ojs_get(base_url, token, endpoint, **params):
@@ -10,16 +9,31 @@ async def ojs_get(base_url, token, endpoint, **params):
 
 async def submission_metadata(base_url, token, id):
     pubid = (await ojs_get(base_url, token, f"/submissions/{id}"))['currentPublicationId']
-    return await ojs_get(base_url, token, f"/submissions/{id}/publications/{pubid}")
+    meta = await ojs_get(base_url, token, f"/submissions/{id}/publications/{pubid}")
+    if meta['issueId']:
+        meta['issue'] = await ojs_get(base_url, token, f"/issues/{meta['issueId']}")
+    return meta
 
 
 if __name__=='__main__':
     import asyncio
     import json
-    KEY = "..."
+    import os
+    key = os.environ['CCR_KEY']
     BASE = "https://computationalcommunication.org/ccr"
-    async def main(BASE, KEY):
-        d = await submission_metadata(BASE, KEY, 188)
+    async def main(key):
+        d = await submission_metadata(BASE, key, 180)
         print(json.dumps(d, indent=4))
+        print(d["pub-id::doi"])
+        print("-----")
+        x = await ojs_get(BASE, key, "/submissions/180", stageId=5)
+        print(json.dumps(x, indent=4))
+        print("-----")
+        x = await ojs_get(BASE, key, "/issues")
+        print(json.dumps(x, indent=4))
+        print("-----")
+        x = await ojs_get(BASE, key, "/submissions/180/publications/114")
+        print(json.dumps(x, indent=4))
 
-    asyncio.run(main(BASE, KEY))
+
+    asyncio.run(main(key))
