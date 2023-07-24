@@ -66,8 +66,8 @@
             {% if doi_assigned %}DOI Assigned: {{doi}}{% else %} No DOI assigned; suggested doi: {{doi}}{%endif%}
           </li>
           <li class="list-group-item list-group-item-{{ 'success' if fpage else 'danger' }}">
-            {% if issue_title %}Guessed first page: {{fpage}} based on sequence nr. {{seqnr}} {% else %} Could not guess page:
-            {{fpage_source}}{%endif%}
+            {% if issue_title %}Guessed first page: {{fpage}} based on sequence nr. {{seqnr}} {% else %} Could not guess
+            page: {{fpage_source}}{%endif%}
           </li>
         </ul>
         <br />
@@ -88,11 +88,11 @@
         {% if not doi_assigned %}
 
         <div class="alert alert-warning" role="alert">
-          Remember to assign the DOI in the system before moving to the next article to avoid using the same sequence nr!
+          Remember to assign the DOI in the system before moving to the next article to avoid using the same sequence
+          nr!
         </div>
-        {% endif %}
+        {% endif %} {% endif %}
       </div>
-{% endif %}
       <div
         class="tab-pane fade show"
         id="metadata-tab-pane"
@@ -243,8 +243,7 @@
         <h5>Generate ZIP file with XML metadata only:</h5>
         <form action="/upload-nopdf" method="post">
           <input type="hidden" name="id" value="{{id}}" />
-            <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
-          </div>
+          <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
         </form>
         <hr />
         <h4>Resulting XML:</h4>

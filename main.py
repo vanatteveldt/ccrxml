@@ -72,30 +72,33 @@ async def get_context(request, id):
 
     issue_id = d["issueId"]
     doi = d["pub-id::doi"]
+
     if issue_id:
-        seqnr = 1
         issue_title = d["issue"]["title"]["en_US"]
         year = d["issue"]["year"]
         volume = d["issue"]["volume"]
         issue = d["issue"]["number"]
-
-        for article in d["issue"]["articles"]:
-            for pub in article["publications"]:
-                if pub_doi := pub["pub-id::doi"]:
-                    if m := re.match(r"10.5117/CCR\d+.\d+.(\d+).\w+", pub_doi):
-                        pub_seqnr = int(m.group(1))
-                        if pub_seqnr >= seqnr:
-                            seqnr = pub_seqnr + 1
-                    else:
-                        raise Exception(r"Cannot parse doi! {pub_doi}")
-        fpage = (seqnr - 1) * 100 + 1
         if doi:
             doi_assigned = True
+            if not (m := re.match(r"10.5117/CCR\d+.\d+.(\d+).\w+", doi)):
+                raise Exception(r"Cannot parse doi! {doi}")
+            seqnr = int(m.group(1))
         else:
+            seqnr = 1
+            for article in d["issue"]["articles"]:
+                for pub in article["publications"]:
+                    if pub_doi := pub["pub-id::doi"]:
+                        if m := re.match(r"10.5117/CCR\d+.\d+.(\d+).\w+", pub_doi):
+                            pub_seqnr = int(m.group(1))
+                            if pub_seqnr >= seqnr:
+                                seqnr = pub_seqnr + 1
+                        else:
+                            raise Exception(r"Cannot parse doi! {pub_doi}")
             last = d["authors"][0]["familyName"]["en_US"]
             last = re.sub(r"\W", "", unidecode(last).upper())[:4]
             doi = f"10.5117/CCR{year}.{issue}.{seqnr}.{last}"
 
+        fpage = (seqnr - 1) * 100 + 1
     else:
         fpage_source = "Assign to an issue first"
     jats_xml = templates.get_template("jats.xml").render(locals())
