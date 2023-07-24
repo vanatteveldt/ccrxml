@@ -66,18 +66,13 @@
             {% if doi_assigned %}DOI Assigned: {{doi}}{% else %} No DOI assigned; suggested doi: {{doi}}{%endif%}
           </li>
           <li class="list-group-item list-group-item-{{ 'success' if fpage else 'danger' }}">
-            {% if issue_title %}Guessed first page: {{fpage}} based on {{fpage_source}}{% else %} Could not guess page:
+            {% if issue_title %}Guessed first page: {{fpage}} based on sequence nr. {{seqnr}} {% else %} Could not guess page:
             {{fpage_source}}{%endif%}
           </li>
         </ul>
         <br />
         <h5 style="text-align: left">Latex snippet for authors</h5>
-        {% if issue_title and num_unpublished > 1 %}
-        <div class="alert alert-danger" role="alert">
-          Warning: There are multiple unpublished articles in the queue. The first page below and DOI do not take this
-          into account!
-        </div>
-        {% endif %}
+
         <pre style="text-align: left; border: 1px solid darkgrey; background: lightgrey; margin: 0.5em; padding: 0.5em">
 \volume{% raw %}{{% endraw %}{{volume if volume}}{% raw %}}{% endraw %}
 \pubnumber{% raw %}{{% endraw %}{{issue if issue}}{% raw %}}{% endraw %}
