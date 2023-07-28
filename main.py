@@ -98,7 +98,7 @@ async def get_context(request, id):
             last = re.sub(r"\W", "", unidecode(last).upper())[:4]
             doi = f"10.5117/CCR{year}.{issue}.{seqnr}.{last}"
 
-        fpage = (seqnr - 1) * 100 + 1
+        fpage = 1
     else:
         fpage_source = "Assign to an issue first"
     jats_xml = templates.get_template("jats.xml").render(locals())

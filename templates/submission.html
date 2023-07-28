@@ -2,7 +2,9 @@
 <div class="row py-lg-5">
   <div class="col-lg-10 col-md-12 mx-auto">
     <h1 class="fw-light">CCR XML</h1>
-    <p class="lead text-muted">Logged in to CCR. <a href="/logout">Log out</a></p>
+    <p class="lead text-muted">
+      Logged in to CCR. <a href="/logout">Log out</a>
+    </p>
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
       <li class="nav-item" role="presentation">
@@ -58,23 +60,32 @@
         tabindex="0"
       >
         <ul class="list-group">
-          <li class="list-group-item list-group-item-{{ 'success' if issue_title else 'danger' }}">
-            {% if issue_title %}Scheduled for publication in: {{issue_title}}{% else %} Not scheduled for
-            publication{%endif%}
+          <li
+            class="list-group-item list-group-item-{{ 'success' if issue_title else 'danger' }}"
+          >
+            {% if issue_title %}Scheduled for publication in: {{issue_title}}{%
+            else %} Not scheduled for publication{%endif%}
           </li>
-          <li class="list-group-item list-group-item-{{ 'success' if doi_assigned else 'danger' }}">
-            {% if doi_assigned %}DOI Assigned: {{doi}}{% else %} No DOI assigned; suggested doi: {{doi}}{%endif%}
-          </li>
-          <li class="list-group-item list-group-item-{{ 'success' if fpage else 'danger' }}">
-            {% if issue_title %}Guessed first page: {{fpage}} based on sequence nr. {{seqnr}} {% else %} Could not guess
-            page: {{fpage_source}}{%endif%}
+          <li
+            class="list-group-item list-group-item-{{ 'success' if doi_assigned else 'danger' }}"
+          >
+            {% if doi_assigned %}DOI Assigned: {{doi}}{% else %} No DOI
+            assigned; suggested doi: {{doi}}{%endif%}
           </li>
         </ul>
         <br />
         {% if issue_title %}
         <h5 style="text-align: left">Latex snippet for authors</h5>
 
-        <pre style="text-align: left; border: 1px solid darkgrey; background: lightgrey; margin: 0.5em; padding: 0.5em">
+        <pre
+          style="
+            text-align: left;
+            border: 1px solid darkgrey;
+            background: lightgrey;
+            margin: 0.5em;
+            padding: 0.5em;
+          "
+        >
 \volume{% raw %}{{% endraw %}{{volume if volume}}{% raw %}}{% endraw %}
 \pubnumber{% raw %}{{% endraw %}{{issue if issue}}{% raw %}}{% endraw %}
 \pubyear{% raw %}{{% endraw %}{{year if year}}{% raw %}}{% endraw %}
@@ -82,14 +93,15 @@
 \doi{% raw %}{{% endraw %}{{doi if doi}}{% raw %}}{% endraw %}</pre
         >
         <div class="alert alert-info" role="alert">
-          If this article is ready to be published, send the snippet above to the authors and ask them to create the
-          final camera-ready PDF and check the metadata in the system (title, authors, abstract, keywords).
+          If this article is ready to be published, send the snippet above to
+          the authors and ask them to create the final camera-ready PDF and
+          check the metadata in the system (title, authors, abstract, keywords).
         </div>
         {% if not doi_assigned %}
 
         <div class="alert alert-warning" role="alert">
-          Remember to assign the DOI in the system before moving to the next article to avoid using the same sequence
-          nr!
+          Remember to assign the DOI in the system before moving to the next
+          article to avoid using the same sequence nr!
         </div>
         {% endif %} {% endif %}
       </div>
@@ -101,7 +113,8 @@
         tabindex="1"
       >
         <div style="text-align: left">
-          COMPUTATIONAL COMMUNICATION RESEARCH {{volume}}.{{issue}} ({{year}}) {{fpage}}- <br />
+          COMPUTATIONAL COMMUNICATION RESEARCH {{volume}}.{{issue}} ({{year}})
+          {{fpage}}- <br />
           https://doi.org/{{doi}}
           <h4>{{title}}</h4>
           {% for author in authors %}
@@ -114,9 +127,8 @@
             <p>{{p}}</p>
             {% endfor %}
             <p>
-              <b>Keywords:</b> {% for kw in keywords %}{{kw}}{% if not loop.last %}<span style="color: red">
-                &centerdot;
-              </span>
+              <b>Keywords:</b> {% for kw in keywords %}{{kw}}{% if not loop.last
+              %}<span style="color: red"> &centerdot; </span>
               {% endif %}{% endfor %}
             </p>
           </div>
@@ -126,49 +138,102 @@
           <div class="row mb-3">
             <label for="title" class="col-sm-2 col-form-label">Title</label>
             <div class="col-sm-10">
-              <input disabled name="title" class="form-control" id="title" value="{{title}}" required />
+              <input
+                disabled
+                name="title"
+                class="form-control"
+                id="title"
+                value="{{title}}"
+                required
+              />
             </div>
           </div>
 
           <div class="row mb-3">
-            <label for="keywords" class="col-sm-2 col-form-label">Keywords</label>
+            <label for="keywords" class="col-sm-2 col-form-label"
+              >Keywords</label
+            >
             <div class="col-sm-10">
-              <input disabled name="keywords" class="form-control" id="keywords" value="{{keywords}}" required />
+              <input
+                disabled
+                name="keywords"
+                class="form-control"
+                id="keywords"
+                value="{{keywords}}"
+                required
+              />
             </div>
           </div>
 
           <div class="row mb-3">
             <label for="doi" class="col-sm-2 col-form-label">DOI</label>
             <div class="col-sm-10">
-              <input disabled name="doi" class="form-control" id="doi" value="{{doi if doi}}" required />
+              <input
+                disabled
+                name="doi"
+                class="form-control"
+                id="doi"
+                value="{{doi if doi}}"
+                required
+              />
             </div>
           </div>
 
           <div class="row mb-3">
             <label for="year" class="col-sm-2 col-form-label">Year</label>
             <div class="col-sm-10">
-              <input disabled name="year" class="form-control" id="year" value="{{year}}" required />
+              <input
+                disabled
+                name="year"
+                class="form-control"
+                id="year"
+                value="{{year}}"
+                required
+              />
             </div>
           </div>
 
           <div class="row mb-3">
             <label for="volume" class="col-sm-2 col-form-label">Volume</label>
             <div class="col-sm-10">
-              <input disabled name="volume" class="form-control" id="volume" value="{{volume}}" required />
+              <input
+                disabled
+                name="volume"
+                class="form-control"
+                id="volume"
+                value="{{volume}}"
+                required
+              />
             </div>
           </div>
 
           <div class="row mb-3">
             <label for="issue" class="col-sm-2 col-form-label">Issue</label>
             <div class="col-sm-10">
-              <input disabled name="issue" class="form-control" id="issue" value="{{issue}}" required />
+              <input
+                disabled
+                name="issue"
+                class="form-control"
+                id="issue"
+                value="{{issue}}"
+                required
+              />
             </div>
           </div>
 
           <div class="row mb-3">
-            <label for="fpage" class="col-sm-2 col-form-label">First page</label>
+            <label for="fpage" class="col-sm-2 col-form-label"
+              >First page</label
+            >
             <div class="col-sm-10">
-              <input disabled name="fpage" class="form-control" id="fpage" value="{{fpage}}" required />
+              <input
+                disabled
+                name="fpage"
+                class="form-control"
+                id="fpage"
+                value="{{fpage}}"
+                required
+              />
             </div>
           </div>
 
@@ -178,10 +243,18 @@
               {% for author in authors %}
               <div class="row mb-3">
                 <div class="col-sm-6">
-                  <input disabled class="form-control" value="{{author.name}}" />
+                  <input
+                    disabled
+                    class="form-control"
+                    value="{{author.name}}"
+                  />
                 </div>
                 <div class="col-sm-6">
-                  <input disabled class="form-control" value="{{author.affiliation}}" />
+                  <input
+                    disabled
+                    class="form-control"
+                    value="{{author.affiliation}}"
+                  />
                 </div>
               </div>
 
@@ -190,9 +263,18 @@
           </div>
 
           <div class="row mb-3">
-            <label for="abstract" class="col-sm-2 col-form-label">Abstract</label>
+            <label for="abstract" class="col-sm-2 col-form-label"
+              >Abstract</label
+            >
             <div class="col-sm-10">
-              <textarea disabled name="abstract" class="form-control" id="abstract" rows="20" required>
+              <textarea
+                disabled
+                name="abstract"
+                class="form-control"
+                id="abstract"
+                rows="20"
+                required
+              >
 {{abstract}}</textarea
               >
             </div>
@@ -213,14 +295,16 @@
           <div class="row mb-3">
             <input type="hidden" name="id" value="{{id}}" />
             <input class="col-sm-10" id="file" name="file" type="file" />
-            <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
+            <button class="submit-btn col-sm-2" type="submit">
+              Create ZIP
+            </button>
           </div>
         </form>
         <hr />
         <h5>Enter link to PDF to generate ZIP file:</h5>
         <p>
-          In case the file is too large (4.5Mb), upload it to e.g. <a href="https://tmpfiles.org/">tmpfiles</a> and
-          paste the link here.
+          In case the file is too large (4.5Mb), upload it to e.g.
+          <a href="https://tmpfiles.org/">tmpfiles</a> and paste the link here.
         </p>
 
         <form action="/upload-link" method="post">
@@ -236,7 +320,9 @@
                 placeholder="e.g. https://tmpfiles.org/123456/article.zip"
               />
             </div>
-            <button class="submit-btn col-sm-2" type="submit">Create ZIP</button>
+            <button class="submit-btn col-sm-2" type="submit">
+              Create ZIP
+            </button>
           </div>
         </form>
         <hr />
