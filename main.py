@@ -23,6 +23,8 @@ app = FastAPI()
 @app.get("/")
 async def index(request: Request):
     key: str = request.cookies.get("ccrkey")
+    backend_url = ojs_url()
+
     if key:
         return templates.TemplateResponse("index.html", locals())
     else:
@@ -71,10 +73,10 @@ def text(value, languages=("en_US", "en")):
 
 async def get_context(request, id):
     key: str = request.cookies.get("ccrkey")
-    d = await submission_metadata(ojs_url(), key, id)
+    backend_url = ojs_url()
+    d = await submission_metadata(backend_url, key, id)
     title = text(d["fullTitle"])
     abstract = text(d["abstract"])
-
     authors = [
         dict(
             name=f"{text(a['givenName'])} {text(a['familyName'])}",

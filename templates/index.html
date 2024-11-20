@@ -2,7 +2,8 @@
 <div class="row py-lg-5">
   <div class="col-lg-6 col-md-8 mx-auto">
     <h1 class="fw-light">CCR XML</h1>
-    <p class="lead text-muted">Logged in to CCR. <a href="/logout">Log out</a></p>
+    <p class="lead text-muted">Logged in to CCR at <a href="{{backend_url}}">{{ backend_url | replace('https://', '')}}</a><br/>
+      <a href="/logout">Log out</a></p>
     <p>Enter a submission ID to get started</p>
     <form action="/submission">
         <div class="row mb-3">

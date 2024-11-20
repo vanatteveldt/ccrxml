@@ -3,7 +3,8 @@
   <div class="col-lg-10 col-md-12 mx-auto">
     <h1 class="fw-light">CCR XML</h1>
     <p class="lead text-muted">
-      Logged in to CCR. <a href="/logout">Log out</a>
+      Logged in to CCR  at <a href="{{backend_url}}">{{ backend_url | replace('https://', '')}}</a><br/>
+      <a href="/logout">Log out</a>
     </p>
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">

@@ -2,7 +2,8 @@
 <div class="row py-lg-5">
   <div class="col-lg-10 col-md-12 mx-auto">
     <h1 class="fw-light">CCR XML</h1>
-    <p class="lead text-muted">Logged in to CCR. <a href="/logout">Log out</a></p>
+    <p class="lead text-muted">Logged in to CCR at <a href="{{backend_url}}">{{ backend_url | replace('https://', '')}}</a><br/>
+      <a href="/logout">Log out</a></p>
     <h4>Please check the metadata and XML below:</h4>
     <hr />
     <div style='text-align: left'>
