@@ -1,3 +1,6 @@
+from functools import cache
+import os
+import sys
 from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
@@ -15,7 +18,6 @@ import aiohttp
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI()
-CCR = "https://computationalcommunication.org/ccr"
 
 
 @app.get("/")
@@ -32,10 +34,18 @@ async def login(request: Request):
     return templates.TemplateResponse("login.html", locals())
 
 
+@cache
+def ojs_url():
+    URL = os.environ.get("OJS_URL")
+    if not URL:
+        raise ValueError("Please set OJS_URL as environment variable!")
+    return URL
+
+
 @app.post("/login")
 async def index(request: Request, response: Response, key: Annotated[str, Form()]):
     try:
-        await ojs_get(CCR, key, "/submissions", count=1)
+        await ojs_get(ojs_url(), key, "/submissions", count=1)
     except Exception as e:
         error = f"Could not login, please check your API key. Error was: {e}"
         return templates.TemplateResponse("login.html", locals())
@@ -52,29 +62,41 @@ async def login():
     return response
 
 
+def text(value, languages=("en_US", "en")):
+    for language in languages:
+        if language in value:
+            return value[language]
+    raise KeyError("Cannot find any of {`languages`} in `value`")
+
+
 async def get_context(request, id):
     key: str = request.cookies.get("ccrkey")
-    d = await submission_metadata(CCR, key, id)
-    title = d["fullTitle"]["en_US"]
-    abstract = d["abstract"]["en_US"]
+    d = await submission_metadata(ojs_url(), key, id)
+    title = text(d["fullTitle"])
+    abstract = text(d["abstract"])
 
     authors = [
         dict(
-            name=f"{a['givenName']['en_US']} {a['familyName']['en_US']}",
-            affiliation=a["affiliation"]["en_US"],
+            name=f"{text(a['givenName'])} {text(a['familyName'])}",
+            affiliation=text(a["affiliation"]),
         )
         for a in d["authors"]
     ]
-    keywords = "; ".join(d["keywords"]["en_US"])
+    keywords = "; ".join(text(d["keywords"]))
     abstract_paras = [x for x in re.split("</?p>", abstract) if x]
     abstract_paras = [textwrap.fill(p, 120) for p in abstract_paras]
     keywords = [x.strip() for x in re.split("[,;]", keywords)]
 
     issue_id = d["issueId"]
-    doi = d["pub-id::doi"]
+    if "pub-id::oid" in d:
+        doi = d["pub-id::doi"]
+    elif "doiObject" in d:
+        doi = d["doiObject"]["doi"] if d["doiObject"] else None
+    else:
+        raise ValueError("No DOI information present")
 
     if issue_id:
-        issue_title = d["issue"]["title"]["en_US"]
+        issue_title = text(d["issue"]["title"])
         year = d["issue"]["year"]
         volume = d["issue"]["volume"]
         issue = d["issue"]["number"]
@@ -94,7 +116,7 @@ async def get_context(request, id):
                                 seqnr = pub_seqnr + 1
                         else:
                             raise Exception(r"Cannot parse doi! {pub_doi}")
-            last = d["authors"][0]["familyName"]["en_US"]
+            last = text(d["authors"][0]["familyName"])
             last = re.sub(r"\W", "", unidecode(last).upper())[:4]
             doi = f"10.5117/CCR{year}.{issue}.{seqnr}.{last}"
 
